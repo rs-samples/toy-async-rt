@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "cooked-waker",
+    "rt",
+]
+
+resolver = "2"
