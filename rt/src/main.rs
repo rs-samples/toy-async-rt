@@ -35,7 +35,7 @@ impl Future for Yield {
     }
 }
 
-async fn simple() -> i32 {
+async fn do_sleep() -> i32 {
     // sleep::sleep(Duration::from_secs(5)).await;
     let p5 = Duration::from_secs(5);
     log::warn!("going to sleep period {:?}", p5);
@@ -65,11 +65,33 @@ async fn simple() -> i32 {
 
     // join(sleep3, sleep5).await;
 
+    5
+}
+
+async fn do_yield() -> i32 {
     let inner = Yield { yielded: false };
     log::warn!("Yielding: {:?}", inner);
     inner.await;
     log::warn!("Yielded");
     10
+}
+
+enum Doit {
+    Both,
+    Sleep,
+    Yield,
+}
+
+async fn simple(op: Doit) -> i32 {
+    match op {
+        Doit::Both => {
+            let (a, b) = futures::join!(do_sleep(), do_yield());
+
+            a + b
+        }
+        Doit::Sleep => do_sleep().await,
+        Doit::Yield => do_yield().await,
+    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -101,7 +123,18 @@ fn main() -> anyhow::Result<()> {
         .init();
 
     log::trace!("Main Start");
-    let fut = simple();
+
+    let args: Vec<String> = std::env::args().collect();
+
+    let both = String::from("both");
+    let arg = args.get(1).unwrap_or(&both);
+    let op = match arg {
+        a if a == "sleep" => Doit::Sleep,
+        a if a == "yield" => Doit::Yield,
+        _ => Doit::Both,
+    };
+
+    let fut = simple(op);
 
     let output = executor::run_future(fut);
 
