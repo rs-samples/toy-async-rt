@@ -72,12 +72,16 @@ async fn simple() -> i32 {
 }
 
 fn main() -> anyhow::Result<()> {
-    simple_logger::SimpleLogger::new()
-        .with_level(log::LevelFilter::Trace)
-        .with_threads(true)
-        .with_colors(true)
-        .env()
-        .init()?;
+    // simple_logger::SimpleLogger::new()
+    //     // .with_level(log::LevelFilter::Trace)
+    //     .with_threads(true)
+    //     .with_colors(true)
+    //     .env()
+    //     .init()?;
+
+    env_logger::Builder::new()
+    .parse_default_env()
+    .init();
 
     log::trace!("Main Start");
     let fut = simple();
