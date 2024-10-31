@@ -3,6 +3,7 @@ mod sleep;
 
 use std::{
     future::Future,
+    io::Write,
     pin::Pin,
     task::{Context, Poll},
     time::Duration,
@@ -80,8 +81,24 @@ fn main() -> anyhow::Result<()> {
     //     .init()?;
 
     env_logger::Builder::new()
-    .parse_default_env()
-    .init();
+        .parse_default_env()
+        .write_style(env_logger::WriteStyle::Always)
+        .format(|buf, record| {
+            let level = record.level();
+            let style = buf.default_level_style(level);
+
+            writeln!(
+                buf,
+                "{}:{} [{} {}] [{style}{}{style:#}] - {}",
+                record.file().unwrap_or("unknown"),
+                record.line().unwrap_or(0),
+                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                record.target(),
+                record.level(),
+                record.args()
+            )
+        })
+        .init();
 
     log::trace!("Main Start");
     let fut = simple();
