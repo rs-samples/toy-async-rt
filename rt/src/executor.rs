@@ -60,13 +60,13 @@ pub fn run_future<F: Future>(future: F) -> F::Output {
         match future.as_mut().poll(&mut cx) {
             Poll::Ready(output) => {
                 log::trace!("Looping Fut: Breaking out Ready, cx: {:?}", cx);
-                break output
-            },
+                break output;
+            }
             Poll::Pending => {
                 log::trace!("Looping Fut: Pending will wait, cx: {:?}", cx);
                 notifier.wait();
                 log::trace!("Looping Fut: Pending will continue, cx: {:?}", cx);
-            },
+            }
         };
     };
 
