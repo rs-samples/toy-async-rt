@@ -86,13 +86,13 @@ fn main() -> anyhow::Result<()> {
         .format(|buf, record| {
             let level = record.level();
             let style = buf.default_level_style(level);
+            let timestamp = buf.timestamp();
 
             writeln!(
                 buf,
-                "{}:{} [{} {}] [{style}{}{style:#}] - {}",
+                "{}:{:<3} [{timestamp} {}] [{style}{}{style:#}] - {}",
                 record.file().unwrap_or("unknown"),
                 record.line().unwrap_or(0),
-                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
                 record.target(),
                 record.level(),
                 record.args()
