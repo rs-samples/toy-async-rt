@@ -41,7 +41,7 @@ impl WakeRef for Notifier {
 
         log::info!("Notifier with {}", was_notified);
         if !was_notified {
-            log::info!("Notifier Awoken");
+            log::info!("Notifier Send Awoken Signal");
             self.cv.notify_one();
         }
     }
