@@ -2,10 +2,7 @@ mod executor;
 mod sleep;
 
 use std::{
-    future::Future,
-    pin::Pin,
-    task::{Context, Poll},
-    time::Duration,
+    future::Future, pin::Pin, task::{Context, Poll}, time::Duration
 };
 
 // use futures::future::join;
@@ -19,6 +16,7 @@ impl Future for Yield {
     type Output = ();
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        log::info!("Yielded = {} cx: {:?}", self.yielded, cx);
         if !self.yielded {
             self.yielded = true;
             cx.waker().wake_by_ref();
@@ -31,7 +29,9 @@ impl Future for Yield {
 
 async fn simple() -> i32 {
     // sleep::sleep(Duration::from_secs(5)).await;
-    let sleep5 = sleep::sleep(Duration::from_secs(5));
+    let p = Duration::from_secs(5);
+    log::info!("going to sleep period {:?}", p);
+    let sleep5 = sleep::sleep(p);
 
     let timeout = sleep::timeout(sleep5, Duration::from_secs(3));
     match timeout.await {
@@ -54,10 +54,19 @@ async fn simple() -> i32 {
     10
 }
 
-fn main() {
+fn main() -> anyhow::Result<()>{
+    simple_logger::SimpleLogger::new()
+        .with_level(log::LevelFilter::Trace)
+        .env()
+        .with_threads(true)
+        .with_colors(true)
+        .init()?;
+
     let fut = simple();
 
     let output = executor::run_future(fut);
 
     assert_eq!(output, 10);
+
+    Ok(())
 }

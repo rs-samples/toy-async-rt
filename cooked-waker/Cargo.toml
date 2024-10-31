@@ -9,3 +9,6 @@ description = "A safe interface for creating async Wakers"
 repository = "https://github.com/Lucretiel/cooked-waker"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = { version = "^0.4.22", features = ["std"] }
