@@ -121,7 +121,6 @@ fn sleeper_thread_channel() -> &'static Sender<Message> {
                     let now = Instant::now();
                     let next_event = loop {
                         match timers.peek_mut() {
-                            None => break None,
                             Some(slot) => {
                                 log::debug!("timer = {slot:?}");
                                 if slot.0 .0 < now {
@@ -138,6 +137,7 @@ fn sleeper_thread_channel() -> &'static Sender<Message> {
                                     break Some(slot.0 .0);
                                 }
                             }
+                            None => break None,
                         }
                     };
                     let message: Message = match next_event {
